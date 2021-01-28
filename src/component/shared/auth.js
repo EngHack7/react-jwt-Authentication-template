@@ -1,11 +1,11 @@
 import React from "react";
 import axios from "axios";
+import {useHistory} from 'react-router-dom'
 const endpoint = "http://localhost:5000";
 
 const headers = {
   "Content-Type": "Application/json",
 };
-
 
 
 export const login = (email, password) => {
@@ -23,7 +23,7 @@ export const login = (email, password) => {
       .catch((error) => {
         alert(error);
       });
-  };
+};
 
 function userP(params) {
 

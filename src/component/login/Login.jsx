@@ -1,16 +1,17 @@
-import React, { useState, useContext } from "react";
+import React, { useState,  } from "react";
 import { Link, useHistory } from "react-router-dom";
 import "./login.css";
-import InputLogin from "../common/inputLogin";
+import InputLogin from "../common/InputForm";
 import { UserContext } from "../../App";
 
 function Login(props) {
-  const usercontext = useContext(UserContext);
   let history = useHistory();
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [errors, seterrors] = useState({});
 
+
+    
   const validateProperty = ({ name, value }) => {
     if (name === "email") {
         // condition when change here
@@ -57,8 +58,12 @@ function Login(props) {
     seterrors(errors || {});
 
     if (errors) return;
-    props.Login(email, password);
+    doSubmit()
   };
+
+  const doSubmit =()=>{
+      props.Login(email, password);
+  }
 
   return (
     <form onSubmit={submitHandler}>

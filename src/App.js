@@ -3,11 +3,11 @@ import './App.css';
 import Nav from './component/Nav'
 import {Route,Switch,useHistory} from 'react-router-dom'
 import Login from './component/login/Login'
-import Register from './component/Register';
+import Register from './component/register/Register';
 import Home from './component/Home';
 import Profile from './component/Profile'
 import axios from 'axios'
-
+import {RegisterEndPoint} from './component/shared/auth'
 
 const endpoint = "http://localhost:5000";
 
@@ -56,6 +56,16 @@ function App() {
       alert(error);
     });
   }
+  const RegisterEndPoint = (form) => {
+    
+    axios.post('register',{form})
+    .then((user) => {
+      history.push('/login')
+    }).catch(error=>{
+      console.log(error)
+    })
+  }
+
 
   return (
     <div className="App">
@@ -63,7 +73,7 @@ function App() {
         <Nav user={user} />
         <Switch>
            <Route path="/login" render={(props)=> (<Login Login = {login} setuser={setuser} ></Login>)}  />
-          <Route path="/register" component={Register}  />
+          <Route path="/register" render={(props) => <Register Register ={RegisterEndPoint} />}  />
           <Route path="/profile:id"  render={()=> <Profile user={user} />} />
           <Route path="/"  render={ (props) => <Home user={user} />}  />
         </Switch>
