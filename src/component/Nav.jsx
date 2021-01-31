@@ -1,10 +1,11 @@
 import React, {  useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../App";
+import _ from 'lodash'
 function Nav(props) {
   var buttons;
 
-  if (props.user) {
+  if (!_.isEmpty(props.user)) {
     console.log(']props nav ',props.user);
     buttons = (
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -27,7 +28,7 @@ function Nav(props) {
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item right">
                 <Link
-                onClick={() => localStorage.clear() }
+                onClick={props.LogOut}
                   className="nav-link active"
                   aria-current="page"
                   to="/login"

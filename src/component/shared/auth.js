@@ -1,31 +1,27 @@
 import React from "react";
 import axios from "axios";
-import {useHistory} from 'react-router-dom'
-const endpoint = "http://localhost:5000";
-
-const headers = {
-  "Content-Type": "Application/json",
-};
+// const endpoint = "http://localhost:5000";
 
 
-export const login = (email, password) => {
-    axios
-      .post(
-        "/signin",
-        { email: email, password: password },
-        { headers: headers }
-      )
-      .then((user) => {
-          localStorage.setItem("auth_token",`barer ${user.token}`)
-          console.log(user);
-          return user;
-      })
-      .catch((error) => {
-        alert(error);
-      });
-};
+class AuthService{
+ 
+  login(form){
+   return axios
+    .post("/signin", form)
+  
+  }
 
-function userP(params) {
+  logout(){localStorage.removeItem('user');}
 
+  register(form){
+
+    return axios.post('register',form)
+  }
+
+  getCurrentUser(){
+    return JSON.parse(localStorage.getItem('user'))
+  }
 
 }
+export default AuthService;
+

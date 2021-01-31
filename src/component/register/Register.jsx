@@ -2,10 +2,14 @@ import React, { useState } from "react";
 import InputLogin from "../common/InputForm";
 import { Link } from "react-router-dom";
 import joi from 'joi-browser'
+import _ from 'lodash'
+import AuthService from '../shared/auth'
 const initialStateForm = {
     data :  {username: "", password: "", email: "", phone: ""},
-    errors : {}
+    errors : {},
+    message : {}
  };
+ const auth = new AuthService();
 
 function Register(props) {
   const [form, setform] = useState(initialStateForm);
@@ -36,7 +40,16 @@ function Register(props) {
     setform({ ...form, errors :errors || {} })
     if (errors) return;
 
-    props.Register(form.data)
+    
+    auth.register(form.data).then(
+        result =>{
+          setform( {...form,message : result.message})
+          console.log(result)
+        }
+    ).catch(err =>{
+      console.log(err.response.data);
+      setform( {...form,message : err.response.data.error});
+     })
       
   };
 
@@ -107,6 +120,7 @@ function Register(props) {
             value={form.data.phone}
             error={form.errors.phone}
           />
+          {!_.isEmpty(form.message) && <span>{form.message}</span>}
           <button type="submit">Register</button>
           <center>or</center>
           <Link to="/login" style={{ color: "black" }}>

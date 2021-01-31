@@ -2,15 +2,24 @@ import React, { useState,  } from "react";
 import { Link, useHistory } from "react-router-dom";
 import "./login.css";
 import InputLogin from "../common/InputForm";
-import { UserContext } from "../../App";
+import AuthService from '../shared/auth'
+import _ from 'lodash'
 
+const _authService = new AuthService()
+const initialForm = {
+ data : {
+  email : '',
+  password : ''
+ },
+  errors : {},
+}
 function Login(props) {
-  let history = useHistory();
-  const [email, setemail] = useState("");
-  const [password, setpassword] = useState("");
-  const [errors, seterrors] = useState({});
+  // let history = useHistory();
+  const [form, setForm] = useState(initialForm)
 
-
+  React.useEffect(() =>{
+      console.log(`error`,form);
+  },[form])
     
   const validateProperty = ({ name, value }) => {
     if (name === "email") {
@@ -25,44 +34,61 @@ function Login(props) {
   };
 
   const handleChange = ({ currentTarget: input }) => {
-    const ferrors = { ...errors};
+    const ferrors = { ...form.errors};
     const errorMessage = validateProperty(input);
+    var data ;
+    console.log('data',data);
     if (errorMessage) ferrors[input.name] = errorMessage;
     else delete ferrors[input.name];
 
     if (input.name === "email") {
-      setemail(input.value);
-      seterrors(ferrors)
+      data=  { ...form.data,[input.name] : input.value}
+      setForm({ ...form, data, errors : ferrors });
     } else {
-      setpassword(input.value);
-      seterrors(ferrors)
+      data =   { ...form.data,[input.name] : input.value}
+      setForm({ ...form,data, errors : ferrors})
     }
   };
 
   //   validate for submit the form
   const validate = () => {
     const fError = {};
-    if (email.trim() === "") {
+    if (form.data.email.trim() === "") {
       fError.email = "user email required";
     }
-    if (password.trim() === "") {
+    if (form.data.password.trim() === "") {
       fError.password = "user password required";
     }
     return Object.keys(fError) === 0 ? null : fError;
   };
+
+
   const submitHandler = (e) => {
     console.log("submit");
     e.preventDefault();
     const errors = validate();
-
-    seterrors(errors || {});
-
-    if (errors) return;
+    setForm({ ...form, errors : errors ||{}})
+    if (!_.isEmpty(form.errors)) return;
+    // console.log('after check ',errors);
     doSubmit()
   };
 
   const doSubmit =()=>{
-      props.Login(email, password);
+    console.log("do submit work");
+    _authService.login(form.data)
+    .then((user) => {
+      console.log(user.data.token);
+      localStorage.setItem("user",user.data.token);
+      props.history.push('/profile')
+      window.location.reload();
+      // return user;
+    })
+    .catch((error) => {
+      console.log(error);
+      console.log('error',error);
+      let errors = { ...form.errors,serverError : error.response.data.error}
+      setForm({...form,errors })
+    });
   }
 
   return (
@@ -73,22 +99,23 @@ function Login(props) {
           onChange={handleChange}
           name="email"
           class_main_div="input-email"
-          value={email}
-          error={errors.email}
+          value={form.data.email}
+          error={form.errors.email}
         />
         <InputLogin
           font_awesome_class="fas fa-user-lock"
           onChange={handleChange}
           name="password"
           class_main_div="input-password"
-          value={password}
-          error={errors.password}
+          value={form.data.password}
+          error={form.errors.password}
         />
 
         <h3>
           <span style={{ color: "red" }} id="success"></span>
         </h3>
-
+        {!_.isEmpty(form.errors.serverError) && 
+        <span style={{color : 'red'}}  >{form.errors.serverError}</span> }
         <button type="submit">Login</button>
         <center>or</center>
 
